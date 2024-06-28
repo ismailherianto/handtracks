@@ -7,20 +7,27 @@ mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands
 
 cap = cv2.VideoCapture(0)
-hands = mp_hands.Hands(max_num_hands=1,min_detection_confidence=0.75,static_image_mode=True)
+hands = mp_hands.Hands(max_num_hands=1,min_detection_confidence=0.75,static_image_mode=False)
 detector = FindHands()
 while True:
     ret, image = cap.read()
-    hand = detector.getPosition(image, range(21), draw=False)
-    # print("Index finger up:", detector.index_finger_up(image))
-    # print("Middle finger up:", detector.middle_finger_up(image))
+    hand = detector.getPosition(image, range(6), draw=False)
+    
+    if len(hand) != 0:
+        fingers = [
+            1 if detector.index_finger_up(image) else 0,
+            1 if detector.middle_finger_up(image) else 0,
+            1 if detector.ring_finger_up(image) else 0,
+            1 if detector.little_finger_up(image) else 0
+        ]
+        # print(fingers)
 
-    if detector.index_finger_up(image) == True and detector.middle_finger_up(image) == True:
-        print('2 jari')
+        totalFingers = fingers.count(1)
 
-    image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
-    result = hands.process(image)
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    result = hands.process(image)
+    
+    
     if result.multi_hand_landmarks:
         for hand_landmarks in result.multi_hand_landmarks:
             mp_drawing.draw_landmarks(
