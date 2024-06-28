@@ -9,6 +9,7 @@ mp_hands = mp.solutions.hands
 cap = cv2.VideoCapture(0)
 hands = mp_hands.Hands(max_num_hands=1,min_detection_confidence=0.75,static_image_mode=False)
 detector = FindHands()
+totalFingers = 0
 while True:
     ret, image = cap.read()
     hand = detector.getPosition(image, range(6), draw=False)
@@ -24,10 +25,10 @@ while True:
 
         totalFingers = fingers.count(1)
 
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+    image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
     result = hands.process(image)
-    
-    
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     if result.multi_hand_landmarks:
         for hand_landmarks in result.multi_hand_landmarks:
             mp_drawing.draw_landmarks(
